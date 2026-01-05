@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<title>User Dashboard</title>
+</head>
+<body class="bg-light">
+
+<div class="container py-3">
+
+<div class="card p-3 mb-3">
+<h5>👤 My Profile</h5>
+<div id="info"></div>
+</div>
+
+<div class="card p-3 mb-3">
+<h5>🍚 Meal History</h5>
+<div id="mealList"></div>
+</div>
+
+<div class="card p-3 mb-3">
+<h5>📊 Monthly Bill</h5>
+<div id="bill"></div>
+</div>
+
+<div class="card p-3">
+<h5>📢 Notice</h5>
+<div id="notice"></div>
+</div>
+
+</div>
+
+<!-- নতুন স্ক্রিপ্ট -->
+<script type="module">
+import { auth, db } from "./firebase.js";
+import { doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const user = auth.currentUser;
+
+if(user) {
+    const snap = await getDoc(doc(db,"users",user.uid));
+
+    info.innerHTML = `
+        Name: ${snap.data().name}<br>
+        Room: ${snap.data().room}<br>
+        Total Meal: ${snap.data().totalMeal}
+    `;
+
+    let totalMeal=0, totalCost=0;
+
+    // মোট মিল গণনা
+    (await getDocs(collection(db,"users"))).forEach(d => totalMeal += d.data().totalMeal);
+
+    // মোট খরচ এবং রেট
+    (await getDocs(collection(db,"costs"))).forEach(d => totalCost += d.data().amount);
+    const rate = totalCost / totalMeal;
+    bill.innerHTML = `Meal Rate: ${rate.toFixed(2)} ৳<br>
+                      Your Bill: ${(rate * snap.data().totalMeal).toFixed(2)} ৳`;
+
+    // মিল হিস্টোরি
+    const q = query(collection(db,"meals"), where("uid","==",user.uid));
+    (await getDocs(q)).forEach(d => {
+        mealList.innerHTML += `<p>${d.data().date} — 🍚 ${d.data().meal}</p>`;
+    });
+
+    // নোটিশ
+    (await getDocs(collection(db,"notice"))).forEach(d => {
+        notice.innerHTML += `<p>📢 ${d.data().text}</p>`;
+    });
+} else {
+    info.innerHTML = "User not logged in.";
+}
+</script>
+
+</body>
+</html>
