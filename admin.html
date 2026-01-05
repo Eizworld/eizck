@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<title>Admin Panel</title>
+</head>
+<body class="bg-light">
+
+<div class="container py-3">
+
+<!-- Dashboard -->
+<div class="row text-center mb-3">
+ <div class="col-6"><div class="card p-3">👥 Users <h4 id="uCount">0</h4></div></div>
+ <div class="col-6"><div class="card p-3">🍚 Meals <h4 id="mCount">0</h4></div></div>
+</div>
+
+<!-- Add User -->
+<div class="card p-3 mb-3">
+<h5>➕ Add User</h5>
+<input id="name" class="form-control mb-2" placeholder="Name">
+<input id="room" class="form-control mb-2" placeholder="Room">
+<input id="phone" class="form-control mb-2" placeholder="Phone">
+<input id="uemail" class="form-control mb-2" placeholder="Email">
+<input id="upass" type="password" class="form-control mb-2" placeholder="Password">
+<button class="btn btn-success w-100" onclick="addUser()">Add User</button>
+</div>
+
+<!-- Add Meal -->
+<div class="card p-3 mb-3">
+<h5>🍚 Add Meal</h5>
+<input id="uid" class="form-control mb-2" placeholder="User UID">
+<input id="meal" type="number" class="form-control mb-2" placeholder="Meal Count">
+<input id="date" type="date" class="form-control mb-2">
+<button class="btn btn-warning w-100" onclick="addMeal()">Add Meal</button>
+</div>
+
+<!-- Monthly Cost -->
+<div class="card p-3 mb-3">
+<h5>💰 Monthly Cost</h5>
+<input id="cost" class="form-control mb-2" placeholder="Total Cost">
+<input id="month" type="month" class="form-control mb-2">
+<button class="btn btn-danger w-100" onclick="addCost()">Save Cost</button>
+</div>
+
+<!-- Notice -->
+<div class="card p-3">
+<h5>📢 Notice</h5>
+<input id="notice" class="form-control mb-2" placeholder="Notice">
+<button class="btn btn-info w-100" onclick="addNotice()">Post</button>
+</div>
+
+</div>
+
+<script type="module">
+import { auth, db } from "./firebase.js";
+import { createUserWithEmailAndPassword } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { collection, addDoc, setDoc, doc, updateDoc, increment, getDocs } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+window.addUser = async ()=>{
+ const u = await createUserWithEmailAndPassword(auth,uemail.value,upass.value);
+ await setDoc(doc(db,"users",u.user.uid),{
+  name:name.value,room:room.value,phone:phone.value,
+  role:"user",totalMeal:0,totalPaid:0
+ });
+ alert("User Added");
+}
+
+window.addMeal = async ()=>{
+ await addDoc(collection(db,"meals"),{
+  uid:uid.value,meal:Number(meal.value),date:date.value
+ });
+ await updateDoc(doc(db,"users",uid.value),{
+  totalMeal:increment(Number(meal.value))
+ });
+ alert("Meal Added");
+}
+
+window.addCost = async ()=>{
+ await addDoc(collection(db,"costs"),{
+  amount:Number(cost.value),month:month.value
+ });
+ alert("Cost Saved");
+}
+
+window.addNotice = async ()=>{
+ await addDoc(collection(db,"notice"),{
+  text:notice.value,time:new Date()
+ });
+ alert("Notice Posted");
+}
+
+// Dashboard summary
+let u=0,m=0;
+(getDocs(collection(db,"users"))).then(s=>{s.forEach(()=>u++);uCount.innerText=u});
+(getDocs(collection(db,"meals"))).then(s=>{s.forEach(d=>m+=d.data().meal);mCount.innerText=m});
+</script>
+
+</body>
+</html>
